@@ -10,7 +10,7 @@ garbage collector. It reproduces a practical subset of `bash` — the kind of
 shell you actually use day to day (pipes, redirections, heredocs, quotes,
 variables, `&&` / `||`, grouped commands and wildcards).
 
-This is a [42 School](https://42.fr) project, built by **yaabdall**
+This is a [42 School](https://42.fr) project, built by **yassabda**
 ([@imyassmine](https://github.com/imyassmine)) & **besch**.
 
 ```console
@@ -298,12 +298,9 @@ Distributed under the **GNU General Public License v3.0**. See
 
 ## Authors
 
-- **yaabdall** — shell core: lexer, parser, executor, expansion, environment,
-  prompt and the garbage collector
-- **besch** — builtins, redirections, heredocs, signal handling and execution
-  errors
+- **yassabda** — shell core: lexer, parser, heredocs, executor, expansion, redirections, prompt and the garbage collector
+- **besch** — builtins, environment, signal handling and execution errors
 
-Both authors worked together on the whole project; the 42 header of each source
-file lists its main author.
+Both authors worked together on the whole project.
 
 42 Paris — project `minishell`, 2024.
