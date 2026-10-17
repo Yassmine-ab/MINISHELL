@@ -101,11 +101,23 @@ void	execute_command(t_node *ast, t_minishell *data, bool in_child)
 		ast->value = expand_variables(ast->value, data);
 	concatenate_adjacent_nodes(ast, data);
 	concatenate_adjacent_nodes(ast->args, data);
+	expand_arguments(ast, data);
 	args = get_command_args(ast, data);
+	data->redir_failed = false;
 	data->in_command = true;
 	save_fds(&data->saved_stdin, &data->saved_stdout);
 	if (ast->redirections && is_builtins(ast->value) == true)
+	{
 		execute_redirections(ast->redirections, data);
+		if (data->redir_failed == true)
+		{
+			data->redir_failed = false;
+			data->last_exit_status = 1;
+			restore_fds(&data->saved_stdin, &data->saved_stdout);
+			data->in_command = false;
+			return ;
+		}
+	}
 	if (is_builtins(ast->value) == true)
 		execute_builtins(ast, data);
 	else

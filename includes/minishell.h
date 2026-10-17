@@ -169,6 +169,7 @@ typedef struct s_minishell
 	int					last_exit_status;
 	bool				is_child_process;
 	bool				child_end_with_signal;
+	bool				redir_failed;
 	bool				in_command;
 	bool				in_single_quotes;
 	bool				in_double_quotes;
@@ -212,6 +213,7 @@ void	execute_pipeline(t_node *ast, t_minishell *data);
 void	execute_redirections(t_node *redir_node, t_minishell *data);
 void	handle_child_exit(int status, t_minishell *data);
 void	concatenate_adjacent_nodes(t_node *node, t_minishell *data);
+void	expand_arguments(t_node *cmd_node, t_minishell *data);
 char	*get_command_path(char *command, t_minishell *data);
 char	**get_command_args(t_node *cmd_node, t_minishell *data);
 void	execute_heredoc(t_node *redir, t_minishell *data);
@@ -219,6 +221,7 @@ pid_t	safe_fork(t_minishell *data);
 
 /* ------------------------------- Expander --------------------------------- */
 char	*expand_variables(char *value, t_minishell *data);
+char	**expand_wildcard(char *pattern, t_minishell *data);
 
 /* ------------------------------ Environment ------------------------------- */
 void	free_envp(t_minishell *data);

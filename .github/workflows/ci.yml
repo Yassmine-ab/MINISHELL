@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.variant }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: mandatory
+            target: all
+            binary: minishell
+          - variant: bonus
+            target: bonus
+            binary: minishell_bonus
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreadline-dev
+
+      - name: Build ${{ matrix.variant }}
+        run: make "${{ matrix.target }}"
+
+      - name: Check the binary was produced
+        run: test -x "./${{ matrix.binary }}"
+
+      - name: Non-interactive mode is rejected
+        run: |
+          set +e
+          "./${{ matrix.binary }}" < /dev/null
+          status=$?
+          set -e
+          test "$status" -eq 1
+
+      - name: Clean target removes every artifact
+        run: |
+          make fclean
+          test ! -e "./${{ matrix.binary }}"
+          test ! -e lib/lib.a
+          test ! -d objs
+
+  tests:
+    name: Functional tests (PTY)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreadline-dev
+
+      - name: Build mandatory and bonus binaries
+        run: make all && make bonus
+
+      - name: Run the test suite on ./minishell
+        run: make test
+
+      - name: Run the test suite on ./minishell_bonus
+        run: make test_bonus
+
+  sanitizers:
+    name: AddressSanitizer
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreadline-dev
+
+      - name: Build with AddressSanitizer
+        run: make debug CFLAGS="-Wall -Wextra -Werror -g3 -fsanitize=address"
+
+      - name: Run the test suite under ASan
+        env:
+          ASAN_OPTIONS: detect_leaks=0:abort_on_error=1
+        run: python3 tests/smoke_test.py ./minishell

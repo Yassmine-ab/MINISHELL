@@ -37,6 +37,43 @@ void	concatenate_adjacent_nodes(t_node *node, t_minishell *data)
 	}
 }
 
+void	expand_arguments(t_node *cmd_node, t_minishell *data)
+{
+	t_node	*arg;
+	t_node	*new_arg;
+	t_node	*next;
+	char	**matches;
+	int		j;
+
+	arg = cmd_node->args;
+	while (arg)
+	{
+		if (arg->is_single_quoted == false)
+			arg->value = expand_variables(arg->value, data);
+		if (arg->is_single_quoted == false && arg->is_double_quoted == false)
+		{
+			matches = expand_wildcard(arg->value, data);
+			if (matches)
+			{
+				next = arg->next;
+				arg->value = matches[0];
+				j = 0;
+				while (matches[++j])
+				{
+					new_arg = gc_calloc(1, sizeof(t_node), &data->gc);
+					new_arg->type = NODE_ARG;
+					new_arg->value = matches[j];
+					new_arg->space_after = true;
+					new_arg->next = next;
+					arg->next = new_arg;
+					arg = new_arg;
+				}
+			}
+		}
+		arg = arg->next;
+	}
+}
+
 char	**get_command_args(t_node *cmd_node, t_minishell *data)
 {
 	int		arg_count;
@@ -48,8 +85,6 @@ char	**get_command_args(t_node *cmd_node, t_minishell *data)
 	arg = cmd_node->args;
 	while (arg)
 	{
-		if (arg->is_single_quoted == false)
-			arg->value = expand_variables(arg->value, data);
 		arg_count++;
 		arg = arg->next;
 	}

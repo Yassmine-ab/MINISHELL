@@ -4,14 +4,15 @@ NAME =			lib.a
 CC =			cc
 FLAGS =			-Wall -Wextra -Werror
 
-SRC =			$(wildcard *.c)
+SRC =			$(wildcard *.c) $(wildcard garbage_collector/*.c)
 OBJ =			$(SRC:.c=.o)
+INCLUDES =		-I. -Iincludes
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 %.o:			%.c
-				@$(CC) $(FLAGS) -c $< -o $@
+				@$(CC) $(FLAGS) $(INCLUDES) -c $< -o $@
 
 $(NAME):		$(OBJ)
 				@ar rcs $(NAME) $(OBJ)

@@ -7,7 +7,7 @@ static bool	fill_remainder(int fd, char **rem, char *buffer, size_t *rem_len)
 
 	bytes_read = 1;
 	buffer[0] = '\0';
-	while (bytes_read && !ft_strchr(buffer, '\n'))
+	while (bytes_read && !ft_strchr_gnl(buffer, '\n'))
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read == -1)
@@ -37,9 +37,9 @@ static char	*extract_line(char **rem)
 	line = malloc(sizeof(char) * (len + 1));
 	if (!line)
 		return (NULL);
-	ft_memcpy(line, *rem, len);
+	ft_memcpy_gnl(line, *rem, len);
 	line[len] = '\0';
-	tmp = ft_strdup((*rem) + len);
+	tmp = ft_strdup_gnl((*rem) + len);
 	free(*rem);
 	*rem = tmp;
 	if (!*rem || !**rem)
@@ -56,11 +56,11 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
 	if (!rem)
-		rem = ft_strdup("");
+		rem = ft_strdup_gnl("");
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!rem || !buffer)
 		return (free(buffer), free(rem), rem = NULL, NULL);
-	rem_len = ft_strlen(rem);
+	rem_len = ft_strlen_gnl(rem);
 	if (fill_remainder(fd, &rem, buffer, &rem_len) == false)
 		return (free(buffer), free(rem), rem = NULL, NULL);
 	free(buffer);

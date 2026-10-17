@@ -12,14 +12,6 @@
 
 #include "minishell.h"
 
-static void	print_unset_error(char *key, t_minishell *data)
-{
-	ft_putstr_fd("unset: ", STDERR_FILENO);
-	ft_putstr_fd(key, STDERR_FILENO);
-	ft_putstr_fd(": not found\n", STDERR_FILENO);
-	data->last_exit_status = 1;
-}
-
 static char	**remove_env_variable(char **envp, int index, t_minishell *data)
 {
 	char	**new_envp;
@@ -55,9 +47,7 @@ void	ft_unset(t_node *cmd_args, t_minishell *data)
 	while (cmd_args)
 	{
 		index = get_env_index(cmd_args->value, data);
-		if (index == -1)
-			print_unset_error(cmd_args->value, data);
-		else
+		if (index != -1)
 		{
 			new_envp = remove_env_variable(data->envp, index, data);
 			free_envp(data);
@@ -65,4 +55,5 @@ void	ft_unset(t_node *cmd_args, t_minishell *data)
 		}
 		cmd_args = cmd_args->next;
 	}
+	data->last_exit_status = 0;
 }

@@ -69,23 +69,33 @@ static void	redirect_fd(t_node *red, t_minishell *data)
 	{
 		data->fd = open(red->right->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (data->fd == -1)
-			error(red->right->value, ": Failed to open file for writing",
-				STDERR_FILENO, data);
+		{
+			error(red->right->value, ": Failed to open file for writing", 1, data);
+			data->redir_failed = true;
+			return ;
+		}
 		(dup2(data->fd, STDOUT_FILENO), safe_close(&data->fd));
 	}
 	else if (ft_strncmp(red->value, ">>", 3) == 0)
 	{
 		data->fd = open(red->right->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if (data->fd == -1)
-			error(red->right->value, ": Failed to open file for appending",
-				STDERR_FILENO, data);
+		{
+			error(red->right->value, ": Failed to open file for appending", 1, data);
+			data->redir_failed = true;
+			return ;
+		}
 		(dup2(data->fd, STDOUT_FILENO), safe_close(&data->fd));
 	}
 	else if (ft_strncmp(red->value, "<", 2) == 0 && data->in_command == true)
 	{
 		data->fd = open(red->right->value, O_RDONLY, 0644);
 		if (data->fd == -1)
+		{
 			error(red->right->value, ": No such file or directory", 1, data);
+			data->redir_failed = true;
+			return ;
+		}
 		(dup2(data->fd, STDIN_FILENO), safe_close(&data->fd));
 	}
 }
@@ -103,6 +113,8 @@ void	execute_redirections(t_node *redir, t_minishell *data)
 			ft_putstr_fd(redir->hd, data->heredoc_fd[1]);
 			redirect_heredoc(data);
 		}
+		if (data->redir_failed == true)
+			break ;
 		redir = redir->next;
 	}
 }

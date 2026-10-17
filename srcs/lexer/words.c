@@ -45,6 +45,8 @@ void	process_word(char *input, int *i, int *count, t_minishell *data)
 {
 	char	*value;
 
+	data->in_single_quotes = false;
+	data->in_double_quotes = false;
 	value = extract_value(input, i, data);
 	data->tokens[*count] = create_token(data->current_type, value);
 	data->tokens[*count].is_single_quoted = data->in_single_quotes;

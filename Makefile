@@ -73,7 +73,7 @@ ENV =			$(SRC)environment/
 SIGNAL =		$(SRC)signal/
 OBJ =			./objs/
 MYLIB_DIR =		./lib/
-INCLUDES =		./includes/ $(MYLIB_DIR)includes/
+INCLUDES =		./includes/ $(MYLIB_DIR) $(MYLIB_DIR)includes/
 
 # Libraries
 MYLIB =			-L $(MYLIB_DIR) -l:lib.a
@@ -185,7 +185,23 @@ help:
 				@echo "$(CYAN)clean$(DEFAULT)		- Clean up object files"
 				@echo "$(CYAN)fclean$(DEFAULT)		- Clean up all object files and executables"
 				@echo "$(CYAN)re$(DEFAULT)		- Rebuild the entire project"
-				@echo "$(CYAN)debug$(DEFAULT)		- Run the program with debugging flags -g3\n"
+				@echo "$(CYAN)debug$(DEFAULT)		- Run the program with debugging flags -g3"
+				@echo "$(CYAN)test$(DEFAULT)		- Run the automated test suite ($(NAME))"
+				@echo "$(CYAN)test_bonus$(DEFAULT)	- Run the automated test suite ($(NAME_BONUS))"
+				@echo "$(CYAN)test_all$(DEFAULT)	- Run the automated test suites\n"
+
+# Rule to run the automated tests (requires python3 and a built binary)
+test:			$(NAME)
+				@echo "\n🧪 $(CYAN)Running the $(WHITE)mandatory$(CYAN) test suite$(DEFAULT)\n"
+				@python3 tests/smoke_test.py $(NAME)
+
+# Rule to run the automated tests against the bonus executable
+test_bonus:		bonus
+				@echo "\n🧪 $(CYAN)Running the $(WHITE)bonus$(CYAN) test suite$(DEFAULT)\n"
+				@python3 tests/smoke_test.py $(NAME_BONUS)
+
+# Rule to run every test suite
+test_all:		test test_bonus
 
 # Rule to ensure that these targets are always executed as intended, even if there are files with the same name
-.PHONY:			all bonus clean fclean re debug help
+.PHONY:			all bonus clean fclean re debug help test test_bonus test_all

@@ -27,7 +27,7 @@ pid_t	safe_fork(t_minishell *data)
 	return (pid);
 }
 
-static void	exec_left_child(t_node *ast, int pipe_fd[2], t_minishell *data)
+static pid_t	exec_left_child(t_node *ast, int pipe_fd[2], t_minishell *data)
 {
 	pid_t	left_child;
 
@@ -41,9 +41,10 @@ static void	exec_left_child(t_node *ast, int pipe_fd[2], t_minishell *data)
 		gc_cleanup(&data->gc);
 		exit(data->last_exit_status);
 	}
+	return (left_child);
 }
 
-static void	exec_right_child(t_node *ast, int pipe_fd[2], t_minishell *data)
+static pid_t	exec_right_child(t_node *ast, int pipe_fd[2], t_minishell *data)
 {
 	pid_t	right_child;
 
@@ -57,20 +58,26 @@ static void	exec_right_child(t_node *ast, int pipe_fd[2], t_minishell *data)
 		gc_cleanup(&data->gc);
 		exit(data->last_exit_status);
 	}
+	return (right_child);
 }
 
 void	execute_pipeline(t_node *ast, t_minishell *data)
 {
-	int	pipe_fd[2];
-	int	status;
+	int		pipe_fd[2];
+	int		status;
+	pid_t	left_child;
+	pid_t	right_child;
 
+	status = 0;
 	if (pipe(pipe_fd) == -1)
 		(gc_cleanup(&data->gc), exit(EXIT_FAILURE));
-	exec_left_child(ast, pipe_fd, data);
-	exec_right_child(ast, pipe_fd, data);
+	left_child = exec_left_child(ast, pipe_fd, data);
+	right_child = exec_right_child(ast, pipe_fd, data);
 	close(pipe_fd[READ_END]);
 	close(pipe_fd[WRITE_END]);
-	waitpid(-1, &status, 0);
-	waitpid(-1, &status, 0);
+	if (left_child > 0)
+		waitpid(left_child, NULL, 0);
+	if (right_child > 0)
+		waitpid(right_child, &status, 0);
 	handle_child_exit(status, data);
 }

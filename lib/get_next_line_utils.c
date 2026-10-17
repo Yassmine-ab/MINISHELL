@@ -1,6 +1,6 @@
 #include "get_next_line.h"
 
-char	*ft_strchr(const char *s, int c)
+char	*ft_strchr_gnl(const char *s, int c)
 {
 	if (!s)
 		return (NULL);
@@ -13,7 +13,7 @@ char	*ft_strchr(const char *s, int c)
 	return ((char *)s);
 }
 
-size_t	ft_strlen(const char *s)
+size_t	ft_strlen_gnl(const char *s)
 {
 	size_t	len;
 
@@ -23,7 +23,7 @@ size_t	ft_strlen(const char *s)
 	return (len);
 }
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+void	*ft_memcpy_gnl(void *dest, const void *src, size_t n)
 {
 	unsigned long		*dest_word;
 	const unsigned long	*src_word;
@@ -44,18 +44,18 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup_gnl(const char *s)
 {
 	char	*str;
 	size_t	len;
 
 	if (!s)
 		return (NULL);
-	len = ft_strlen(s);
+	len = ft_strlen_gnl(s);
 	str = malloc(sizeof(char) * (len + 1));
 	if (!str)
 		return (NULL);
-	ft_memcpy(str, s, len);
+	ft_memcpy_gnl(str, s, len);
 	str[len] = '\0';
 	return (str);
 }
@@ -70,8 +70,8 @@ char	*ft_strjoin_with_len(const char *s1, const char *s2,
 	str = malloc(sizeof(char) * (s1_len + s2_len + 1));
 	if (!str)
 		return (NULL);
-	ft_memcpy(str, s1, s1_len);
-	ft_memcpy(str + s1_len, s2, s2_len);
+	ft_memcpy_gnl(str, s1, s1_len);
+	ft_memcpy_gnl(str + s1_len, s2, s2_len);
 	str[s1_len + s2_len] = '\0';
 	return (str);
 }

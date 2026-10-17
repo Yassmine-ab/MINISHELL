@@ -89,6 +89,7 @@ void	data_init(int argc, char **argv, char **envp, t_minishell *data)
 	data->open_parentheses = 0;
 	data->is_child_process = false;
 	data->child_end_with_signal = false;
+	data->redir_failed = false;
 	data->in_command = false;
 	data->in_single_quotes = false;
 	data->in_double_quotes = false;

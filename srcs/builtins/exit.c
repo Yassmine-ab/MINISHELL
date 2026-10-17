@@ -68,8 +68,6 @@ void	ft_exit(t_node *cmd_args, t_minishell *data)
 		}
 		check_arg_value(cmd_args->value, data);
 	}
-	if (data->line == 0)
-		data->last_exit_status = 0;
 	(safe_close(&data->saved_stdin), safe_close(&data->saved_stdout));
 	(safe_close(&data->fd));
 	ft_putstr_fd("exit\n", STDERR_FILENO);
